@@ -84,7 +84,6 @@ def currstreak(db, habitName):
     cur = db.cursor()
     cur.execute("SELECT currentstreak FROM streak WHERE habitName = ?", (habitName,))
     return cur.fetchone()
-
     
 def get_habit_data(db, name):
     cur = db.cursor()
@@ -116,6 +115,11 @@ def reset_streak(db, habitName):
     cur.execute("UPDATE streak SET currentstreak = 0 WHERE habitName = ?", (habitName,))
     db.commit()
 
+def reset_streak_highscore(db, habitName):
+    cur = db.cursor()
+    cur.execute("UPDATE streak SET currentstreak = 0, highscore = 0 WHERE habitName = ?", (habitName,))
+    db.commit()    
+
 def get_habit_last_checked(db):
     cur = db.cursor()
     cur.execute("SELECT name, frequency, last_checked FROM habits")
@@ -125,3 +129,25 @@ def get_start_date(db, name):
     cur = db.cursor()
     cur.execute("SELECT start FROM habits WHERE name = ?", (name,))
     return cur.fetchone()    
+
+def update_name(db, old_name, new_name):
+    cur = db.cursor()
+    cur.execute("UPDATE habits SET name = ? WHERE name = ?", (new_name, old_name,))
+    cur.execute("UPDATE streak SET habitName = ? WHERE habitName = ?", (new_name, old_name))
+    db.commit()
+
+def update_streak_to_daily(db, name):
+    cur = db.cursor()
+    cur.execute("UPDATE habits SET frequency = 'Daily' WHERE name = ?", (name,))
+    db.commit()    
+
+def update_streak_to_weekly(db, name):
+    cur = db.cursor()
+    cur.execute("UPDATE habits SET frequency = 'Weekly' WHERE name = ?", (name,))
+    db.commit()      
+
+def habit_exists(db, name):
+    cur = db.cursor()
+    cur.execute("SELECT COUNT(*) FROM habits WHERE name = ?", (name,))
+    count = cur.fetchone()[0]
+    return count > 0
