@@ -3,12 +3,18 @@ from datetime import date
 
 
 def get_db(name="main.db"):
+    """
+    Establishes a connection to the SQLite database and creates the necessary tables if they don't exist.
+    """
     db = sqlite3.connect(name)
     create_tables(db)
     return db
 
 
 def create_tables(db):
+    """
+    Creates the Database Tables
+    """
     cur = db.cursor()
 
     cur.execute("""CREATE TABLE IF NOT EXISTS habits (
@@ -36,19 +42,16 @@ def add_habit(db, name, frequency, last_checked="Not Checked"):
     cur.execute("INSERT OR IGNORE INTO streak (creationdate, currentstreak, habitName) VALUES (?, ?, ?)",(date.today(), 0, name))
     db.commit()
 
-
 def check_off(db, habitName):
     cur = db.cursor()
     cur.execute("UPDATE streak SET currentstreak =  currentstreak + 1 WHERE habitName = ?", (habitName,))
     cur.execute("UPDATE habits SET last_checked = ? WHERE name = ?", (date.today(), habitName))
     db.commit()
 
-
 def all_habits(db):
     cur = db.cursor()
     cur.execute("SELECT * FROM habits")
     return cur.fetchall()
-
 
 def daily_habits(db):
     cur = db.cursor()

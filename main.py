@@ -6,16 +6,19 @@ from analyse import count_habits, count_daily_habits, count_weekly_habits, daily
 def cli():
     db = get_db()
 
+    #reviews all habits if a check off has been missed and resets streaks accordingly at the start of the application
     dbHabit.review_all_habits(db)
 
 
     stop = False
     while not stop:
+        #Main User Menu to navigate between: Create new habit, Check off habit, Modify habits, Analyse, Exit
         choice = questionary.select(
             "User Menu",
             choices=["Create new habit", "Check off habit", "Modify habits", "Analyse", "Exit"]
         ).ask()
 
+        #Create a new habit and stores it in database
         if choice == "Create new habit":
             name = questionary.text("What is the name of the new habit?").ask()
             frequency = questionary.select("Do you want to check off this habit daily or weekly?", choices=["Daily", "Weekly"]).ask()
@@ -25,6 +28,8 @@ def cli():
             else:    
                 habit = dbHabit(name, frequency, last_checked)
                 habit.store(db)
+
+        #Check off habit and updates streak and last checked value        
         elif choice == "Check off habit":
             habit_name = questionary.text("Write the name of the habit you want to check off").ask()
             habit_data = get_habit_data(db, habit_name)
@@ -35,12 +40,13 @@ def cli():
                 habit.check(db)
             else:
                 print("ERROR: Habit not found in the database.")    
+
+        #Change the name or the frequency of a habit, if frequency gets changed, highscore and streak value gets reset to 0        
         elif choice == "Modify habits":
             habit_name = questionary.text("Write the name of the habit you want to modify").ask()
             habit_data = get_habit_data(db, habit_name)
             if habit_data is not None:
                 habit_frequency = habit_data[1] 
-                print (habit_frequency)
             else:
                 print("ERROR: Habit not found in the database.")     
 
@@ -69,7 +75,7 @@ def cli():
                         update_streak_to_daily(db, habit_name)
                         reset_streak_highscore(db, habit_name)
 
-
+        #Analyze habit data
         elif choice == "Analyse":
             count = count_habits(db)
             print(f"You have {count} habits")
@@ -91,6 +97,7 @@ def cli():
                 best_daily_highscore(db)
                 best_weekly_highscore(db)
 
+            #takes user input and displays specific habit stats: current streak, highscore, creation date
             elif choice == "Analyze specific habit stats":
                 habit_name = questionary.text("Write the name of the habit you want to analyze").ask()
                 habit_data = get_habit_data(db, habit_name)
@@ -102,7 +109,7 @@ def cli():
                 else:
                     print("ERROR: Habit not found in the database.")
                 
-            
+        #Exits the applicaton    
         elif choice == "Exit":
             print("Good bye!")
             stop = True        
