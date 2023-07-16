@@ -22,11 +22,17 @@ rm main.py
 After starting the program the user Menu appears where the user has 6 different options to choose from:
 
 1 - Create new habit
+
 2 - Check off habit
+
 3 - Modify habits
+
 4 - Analyse
+
 5 - Insert or Delete Mock Data
+
 6 - Exit
+
 
 1 - Create a new habit:
 Creating a new habit is very easy. Upon choosing this option, you can write the name of the new habit to be created and then choose a periodicity, either Daily or Weekly in which you want to check off the habit, e.g. complete the task. After entering this information, name, and periodicity, the habit is stored in the database
