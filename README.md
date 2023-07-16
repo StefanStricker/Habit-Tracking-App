@@ -7,7 +7,9 @@ In this application, users can create new habits they want to implement in their
 
 ## Installation manual:
 1 - git clone https://github.com/StefanStricker/Airbnb_Datamart.git
+
 2 - cd Habit-Tracker-App
+
 3 - pip install -r requirements.txt
 
 ## Run the Application
