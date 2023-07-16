@@ -6,7 +6,7 @@ This habit tracker application provides an easy and convenient way to keep track
 In this application, users can create new habits they want to implement in their life and keep track of achievements through increasing streaks and high scores. This is achieved by checking off a habit in a given periodicity (e.g. daily or weekly). For example, the streak increases for a daily habit, if the habit has been checked off for two consecutive days in a row and will be reset if a day has been missed. Habits can also be analyzed and edited, and there is also an option to insert Mock-Data to test all functionalities (This Mock-Data can also be deleted without it interfering with manually created habits)
 
 ## Installation manual:
-1 - git clone https://github.com/StefanStricker/Airbnb_Datamart.git
+1 - git clone https://github.com/StefanStricker/Habit-Tracking-App
 
 2 - cd Habit-Tracker-App
 
