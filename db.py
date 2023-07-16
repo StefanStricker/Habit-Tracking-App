@@ -196,5 +196,3 @@ def delete_habit(db, name):
     cur.execute("DELETE FROM habits WHERE name =?", (name,))
     cur.execute("DELETE FROM streak WHERE habitName =?", (name,))
     db.commit()        
-
-  
