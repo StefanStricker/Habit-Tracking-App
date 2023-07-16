@@ -1,8 +1,8 @@
 from habit import Habit, dbHabit
-from db import get_db, add_habit, check_off, all_habits, daily_habits, get_daily_names_streaks, get_highest_daily_streak
+from db import get_db, add_habit, check_off, all_habits, get_start_date, get_highest_daily_streak
 from analyse import count_habits
 
-from datetime import date
+from datetime import date, datetime
 
 class TestHabit:
 
@@ -30,8 +30,11 @@ class TestHabit:
         habit = Habit("test_habit_1", "test_frequency_1")
 
         habit.check()
+        assert habit.streak == 1
+
         habit.reset()
-        habit.check()
+        assert habit.streak == 0
+
 
     def test_dbhabit(self):
         dbhabit = dbHabit("test_habit3", "Daily", last_checked = "Not Checked")         
@@ -42,26 +45,45 @@ class TestHabit:
         assert dbhabit.streak == 1
         assert str(dbhabit.last_checked) == date.today().strftime("%Y-%m-%d")
 
-        ###Test if streak gets reset when not checked off for a day###
-        dbhabit1 = dbHabit("test_habit3", "Daily", streak = 4, last_checked = "2023-07-13")   
+        dbhabit.check(self.db)
+        assert dbhabit.streak == 1
 
-        dbhabit1.review(self.db) 
+
+        dbhabit1 = dbHabit("test_habit4", "Weekly")
+
+        dbhabit1.last_checked = "2023-06-12"
+        dbhabit1.check(self.db)
+
+        dbhabit1.last_checked = "2023-06-19"
+        dbhabit1.check(self.db)
+
+        #test if check_highscore stays correct after streak gets reset
+        dbhabit1.last_checked = "2023-06-26"
+        dbhabit1.check_highscore(self.db)
+        assert dbhabit1.highscore == 2
+
+        #test if review resets streak to 0 since a week has been missed to check off
+        dbhabit1.review(self.db)
         assert dbhabit1.streak == 0
 
-        dbhabit1.check_highscore(self.db)
-        assert dbhabit1.highscore == 3
-
-        dbhabit.review_all_habits(self.db)   
+        dbHabit.review_all_habits(self.db)   
 
     def test_db(self):
         data = all_habits(self.db)
         assert len(data) == 6
 
+        #Test if the number of habits in the database gets retrieved correctly.
         count = count_habits(self.db)
         assert count == 6
 
+        #Test if the highest daily streak in the database gets retrieved correctly.
         highest_streak = get_highest_daily_streak(self.db)
         assert highest_streak[0] == 5  
+        
+        #Test if the start date for the habit matches today's date.
+        start_date = get_start_date(self.db, "test_habit3")
+        assert datetime.strptime(start_date[0], "%Y-%m-%d").date() == date.today()
+
 
     def teardown_method(self):
         import os

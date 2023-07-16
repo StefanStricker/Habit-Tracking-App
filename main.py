@@ -1,7 +1,9 @@
 import questionary
-from db import get_db, get_habit_data, update_name, update_streak_to_daily, update_streak_to_weekly, reset_streak_highscore, habit_exists
+from db import get_db, get_habit_data, update_name, update_streak_to_daily, update_streak_to_weekly, reset_streak_highscore, habit_exists, last_checked_reset, delete_habit
 from habit import dbHabit
 from analyse import count_habits, count_daily_habits, count_weekly_habits, daily_habits_streaks, weekly_habits_streaks, best_daily_highscore, best_weekly_highscore, specific_highscore, current_streak, print_start
+from mock_data import delete_mock_data, create_mock_data
+import sqlite3
 
 def cli():
     db = get_db()
@@ -15,7 +17,7 @@ def cli():
         #Main User Menu to navigate between: Create new habit, Check off habit, Modify habits, Analyse, Exit
         choice = questionary.select(
             "User Menu",
-            choices=["Create new habit", "Check off habit", "Modify habits", "Analyse", "Exit"]
+            choices=["Create new habit", "Check off habit", "Modify habits", "Analyse", "Insert or Delete Mock Data", "Exit"]
         ).ask()
 
         #Create a new habit and stores it in database
@@ -51,8 +53,8 @@ def cli():
                 print("ERROR: Habit not found in the database.")     
 
             choice = questionary.select(
-                "Do you want to change the name or the frequency?",
-                choices=["Change name", "Change frequency"]
+                "What do you want to modify?",
+                choices=["Change name", "Change frequency", "Delete habit"]
             ).ask()
 
             if choice == "Change name":
@@ -71,9 +73,16 @@ def cli():
                     if habit_frequency == "Daily":
                         update_streak_to_weekly(db, habit_name)
                         reset_streak_highscore(db, habit_name)
+                        last_checked_reset(db, habit_name)
+                        
                     if habit_frequency == "Weekly":
                         update_streak_to_daily(db, habit_name)
                         reset_streak_highscore(db, habit_name)
+                        last_checked_reset(db, habit_name)
+
+            if choice == "Delete habit":
+                delete_habit(db, habit_name)   
+                print(f" habit: {habit_name} deleted")         
 
         #Analyze habit data
         elif choice == "Analyse":
@@ -108,13 +117,29 @@ def cli():
                     
                 else:
                     print("ERROR: Habit not found in the database.")
-                
+
+        elif choice == "Insert or Delete Mock Data":
+            db = sqlite3.connect("main.db")
+            choice = questionary.select(
+                "Would you like to Insert or Delete the Mock data?",
+                choices=["Insert Mock Data", "Delete Mock Data"]
+            ).ask() 
+
+            if choice == "Insert Mock Data":
+                create_mock_data(db)
+                print("Mock Data Inserted")
+
+            elif choice == "Delete Mock Data":
+                delete_mock_data(db)  
+                print("Mock Data deleted")         
+
         #Exits the applicaton    
         elif choice == "Exit":
             print("Good bye!")
+            db.close()
             stop = True        
         else:
-            print("Good bye!")
+            print("Good bye error!!")
             stop = True 
           
 

@@ -57,8 +57,10 @@ class dbHabit(Habit):
         """Checks if the current streak is higher than the highscore and updates it in the database."""
         highscore = get_highscore(db, self.name)
         currentstreak = currstreak(db, self.name)    
-        if currentstreak > highscore:
+        if currentstreak >= highscore:
+            self.highscore = highscore
             new_highscore(db, self.name)
+            
 
     def review(self, db):
         """Reviews the habit's streak and resets it if it was not checked off in the respective frequency."""
@@ -66,20 +68,23 @@ class dbHabit(Habit):
         if self.frequency == "Daily":
             if self.last_checked == "Not Checked":
                 return   
+            
             last_checked_date = datetime.strptime(str(self.last_checked), "%Y-%m-%d").date()
             one_day_ago = today - timedelta(days=1)
             if last_checked_date < one_day_ago:
                 reset_streak(db, self.name)
-                self.streak = 0
+                self.reset()
 
         if self.frequency == "Weekly":
             if self.last_checked == "Not Checked":
-                return   
+                return
+            
             last_checked_date = datetime.strptime(str(self.last_checked), "%Y-%m-%d").date()
             one_week_ago = today - timedelta(weeks=1)
             if last_checked_date < one_week_ago:
                 reset_streak(db, self.name)  
-                self.streak = 0
+                self.reset()
+   
        
     @staticmethod                                    
     def review_all_habits(db):
@@ -100,7 +105,7 @@ class dbHabit(Habit):
         """Checks off the habit for the current day if habit has not been checked off in specific frequency """
         if self.frequency == "Daily":
             if self.last_checked != "Not Checked":
-                last_checked_date = datetime.strptime(self.last_checked, "%Y-%m-%d").date()
+                last_checked_date = datetime.strptime(str(self.last_checked), "%Y-%m-%d").date()
                 if last_checked_date == today:
                     print("You have already checked off this habit today.")
                     return
@@ -121,7 +126,7 @@ class dbHabit(Habit):
                 print(f"habit {self.name} checked off for this week")
 
             else:
-                last_checked_date = datetime.strptime(self.last_checked, "%Y-%m-%d").date()
+                last_checked_date = datetime.strptime(str(self.last_checked), "%Y-%m-%d").date()
                 last_checked_week_start = last_checked_date - timedelta(days=last_checked_date.weekday())
                 if last_checked_week_start != today - timedelta(days=today.weekday()):
                     self.increment(db)   
