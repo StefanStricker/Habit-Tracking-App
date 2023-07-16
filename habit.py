@@ -14,7 +14,7 @@ Attributes:
         streak (int): The current streak count for the habit.
         highscore (int): The highest streak count achieved for the habit.
         start (datetime.date): The start date of the habit.
-        last_checked (str): The last checked date of the habit. Not Checked if not checked yet.
+        last_checked (datetime.date): The last checked date of the habit. string Not Checked if not checked yet.
 """
 class Habit:
 
@@ -140,3 +140,4 @@ class dbHabit(Habit):
     def store(self, db):
         """stores new habit in the database"""
         add_habit(db, self.name, self.frequency, self.last_checked)    
+     
