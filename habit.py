@@ -5,18 +5,18 @@ from datetime import datetime, date, timedelta
 
 today = date.today()
 
-"""
-Represents a habit class with its properties and methods
+class Habit:
+    """
+    Represents a habit class with its properties and methods
 
-Attributes:
+    Attributes:
         name (str): The name of the habit.
         frequency (str): The frequency of the habit (e.g., "Daily", "Weekly").
         streak (int): The current streak count for the habit.
         highscore (int): The highest streak count achieved for the habit.
         start (datetime.date): The start date of the habit.
         last_checked (datetime.date): The last checked date of the habit. string Not Checked if not checked yet.
-"""
-class Habit:
+    """
 
     def __init__(self, name, frequency, streak = 0, highscore = 0, start = date.today(), last_checked = "Not Checked"):
         self.name = name
@@ -35,13 +35,14 @@ class Habit:
         """Resets the streak count to zero."""
         self.streak = 0
 
-"""
+
+class dbHabit(Habit):  
+    """
     Represents a habit with additional functionality for database integration.
 
     Inherits from:
         Habit
-""" 
-class dbHabit(Habit):  
+    """ 
 
     def __init__(self, name, frequency, streak = 0, highscore = 0, start = date.today(), last_checked = "Not Checked"):
         super().__init__(name, frequency, streak, highscore, start)
