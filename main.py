@@ -50,7 +50,8 @@ def cli():
             if habit_data is not None:
                 habit_frequency = habit_data[1] 
             else:
-                print("ERROR: Habit not found in the database.")     
+                print("ERROR: Habit not found in the database.") 
+                continue   
 
             choice = questionary.select(
                 "What do you want to modify?",
@@ -93,7 +94,7 @@ def cli():
 
             choice = questionary.select(
                 "What would you like to do?",
-                choices=["Show all daily habits & streak", "Show all weekly habits & streak", "Show highscores", "Analyze specific habit stats"]
+                choices=["Show all daily habits & streak", "Show all weekly habits & streak", "Show highscores", "Analyze specific habit stats", "Return to User Menu"]
             ).ask()
 
             if choice == "Show all daily habits & streak":
@@ -118,11 +119,14 @@ def cli():
                 else:
                     print("ERROR: Habit not found in the database.")
 
+            if choice == "Return to User Menu":
+                continue       
+
         elif choice == "Insert or Delete Mock Data":
             db = sqlite3.connect("main.db")
             choice = questionary.select(
                 "Would you like to Insert or Delete the Mock data?",
-                choices=["Insert Mock Data", "Delete Mock Data"]
+                choices=["Insert Mock Data", "Delete Mock Data", "Return to User Menu"]
             ).ask() 
 
             if choice == "Insert Mock Data":
@@ -131,7 +135,10 @@ def cli():
 
             elif choice == "Delete Mock Data":
                 delete_mock_data(db)  
-                print("Mock Data deleted")         
+                print("Mock Data deleted")     
+
+            elif choice == "Return to User Menu":
+                continue       
 
         #Exits the applicaton    
         elif choice == "Exit":
