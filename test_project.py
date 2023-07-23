@@ -1,5 +1,5 @@
 from habit import Habit, dbHabit
-from db import get_db, add_habit, check_off, all_habits, get_start_date, get_highest_daily_streak
+from db import get_db, get_highscore, check_off, all_habits, get_start_date, get_highest_daily_streak, get_habit_data, currstreak
 from analyse import count_habits
 
 from datetime import date, datetime
@@ -8,23 +8,42 @@ class TestHabit:
 
     def setup_method(self):
         self.db = get_db("test.db")
+        cursor = self.db.cursor()
+        cursor.executemany(
+            "INSERT INTO habits (name, frequency, last_checked, start) VALUES (?, ?, ?, ?)",
+            [
+                ("Test_Habit_1", "Daily", "2023-07-16", "2023-06-01"),
+                ("Test_Habit_2", "Weekly", "2023-07-14", "2023-04-17"),
+                ("Test_Habit_3", "Daily", "2023-07-12", "2023-06-06"),
+                ("Test_Habit_4", "Daily", "2023-07-16", "2023-05-07"),
+                ("Test_Habit_5", "Weekly", "2023-07-08", "2023-07-08"),
+                ("Test_Habit_6", "Daily", "2023-07-16", "2023-03-22"),
+                ("Test_Habit_7", "Weekly", "2023-07-01", "2023-06-12"),
+            ]
+        )
+        self.db.commit()
 
-        add_habit(self.db, "test_habit", "Daily")
-        add_habit(self.db, "test_habit1", "Daily")
-        add_habit(self.db, "test_habit2", "Daily")
-        add_habit(self.db, "test_habit3", "Daily")
-        add_habit(self.db, "test_habit4", "Weekly")
-        add_habit(self.db, "test_habit5", "Weekly")
+        cursor.executemany(
+            "INSERT INTO streak (currentstreak, highscore, habitName) VALUES (?, ?, ?)",
+            [
+                ("4", "13", "Test_Habit_1"),
+                ("1", "2", "Test_Habit_2"),
+                ("6", "6", "Test_Habit_3"),
+                ("5", "12", "Test_Habit_4"),
+                ("0", "1", "Test_Habit_5"),
+                ("12", "12", "Test_Habit_6"),
+                ("7", "7", "Test_Habit_7"),
+            ]
+        )
+        self.db.commit()
 
-        check_off(self.db, "test_habit")
-        check_off(self.db, "test_habit")
-        check_off(self.db, "test_habit")
-        check_off(self.db, "test_habit")
-        check_off(self.db, "test_habit")
-        check_off(self.db, "test_habit3")
-        check_off(self.db, "test_habit3")
-        check_off(self.db, "test_habit3")
-
+    def test_habit_1(self):        
+        habit1 = get_habit_data(self.db, "Test_Habit_1")
+        streak = currstreak(self.db, "Test_Habit_1")
+        highscore = get_highscore(self.db, "Test_Habit_1")
+        assert streak == 4
+        assert highscore == 13
+        assert habit1[1] == "Daily"
 
     def test_habit(self):
         habit = Habit("test_habit_1", "test_frequency_1")
@@ -37,7 +56,8 @@ class TestHabit:
 
 
     def test_dbhabit(self):
-        dbhabit = dbHabit("test_habit3", "Daily", last_checked = "Not Checked")         
+
+        dbhabit = dbHabit("Test_Habit_1", "Daily", last_checked = "Not Checked")         
 
         dbhabit.check(self.db) 
         print(dbhabit.last_checked)
@@ -49,7 +69,7 @@ class TestHabit:
         assert dbhabit.streak == 1
 
 
-        dbhabit1 = dbHabit("test_habit4", "Weekly")
+        dbhabit1 = dbHabit("Test_Habit_5", "Weekly")
 
         dbhabit1.last_checked = "2023-06-12"
         dbhabit1.check(self.db)
@@ -70,19 +90,19 @@ class TestHabit:
 
     def test_db(self):
         data = all_habits(self.db)
-        assert len(data) == 6
+        assert len(data) == 7
 
         #Test if the number of habits in the database gets retrieved correctly.
         count = count_habits(self.db)
-        assert count == 6
+        assert count == 7
 
         #Test if the highest daily streak in the database gets retrieved correctly.
         highest_streak = get_highest_daily_streak(self.db)
-        assert highest_streak[0] == 5  
+        assert highest_streak[0] == 12 
         
-        #Test if the start date for the habit matches today's date.
-        start_date = get_start_date(self.db, "test_habit3")
-        assert datetime.strptime(start_date[0], "%Y-%m-%d").date() == date.today()
+        #Test if the start date for the habit gets retrieved correcty.
+        start_date = get_start_date(self.db, "Test_Habit_3")
+        assert datetime.strptime(start_date[0], "%Y-%m-%d").date() ==  datetime(2023, 6, 6).date()
 
 
     def teardown_method(self):
