@@ -37,7 +37,8 @@ class TestHabit:
         )
         self.db.commit()
 
-    def test_habit_1(self):        
+    def test_habit_1(self):  
+        #test if habit data gets retrieved corretly      
         habit1 = get_habit_data(self.db, "Test_Habit_1")
         streak = currstreak(self.db, "Test_Habit_1")
         highscore = get_highscore(self.db, "Test_Habit_1")
@@ -46,19 +47,18 @@ class TestHabit:
         assert habit1[1] == "Daily"
 
     def test_habit(self):
+        #test habit.check and habit.reset
         habit = Habit("test_habit_1", "test_frequency_1")
 
         habit.check()
         assert habit.streak == 1
-
         habit.reset()
         assert habit.streak == 0
 
 
     def test_dbhabit(self):
-
+        #test if last_checked and streak get updated correctly
         dbhabit = dbHabit("Test_Habit_1", "Daily", last_checked = "Not Checked")         
-
         dbhabit.check(self.db) 
         print(dbhabit.last_checked)
         print(date.today().strftime("%Y-%m-%d"))
