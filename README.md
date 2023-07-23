@@ -9,7 +9,7 @@ In this application, users can create new habits they want to implement in their
 
 1 - git clone https://github.com/StefanStricker/Habit-Tracking-App.git
 
-2 - cd Habit-Tracker-App
+2 - cd Habit-Tracking-App
 
 3 - pip install -r requirements.txt
 
@@ -17,7 +17,7 @@ In this application, users can create new habits they want to implement in their
 python main.py
 
 ## Remove all habits // Remove database
-rm main.py
+rm main.db
 
 ## Usage:
 After starting the program the user Menu appears where the user has 6 different options to choose from:
